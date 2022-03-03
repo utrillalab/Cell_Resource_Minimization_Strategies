@@ -1,0 +1,23 @@
+name: emarquez_ME
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+  - anaconda
+  - http://conda.anaconda.org/gurobi
+  - r
+dependencies:
+  - python=3.6
+  - numpy
+  - scipy=0.19
+  - pytest=3.0
+  - cplex
+  - glpk
+  - pandas
+  - lxml
+  - pytest-benchmark=3.0
+  - matplotlib
+  - matplotlib-venn
+  - escher
+prefix: /home/notebooks/miniconda3/envs/emarquez_ME
+
