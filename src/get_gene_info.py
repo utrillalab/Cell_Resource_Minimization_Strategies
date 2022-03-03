@@ -2,6 +2,8 @@ from Bio import SeqIO
 import pandas as pd
 
 def get_genome_info(genome_path):
+    '''Extract relevant information from the genbank file (Gen name, Bnumber, Gen start position, Gen end position and length)'''
+    
     genome_gb = next(SeqIO.parse(genome_path, "genbank"))
     datos={'Gen':[],
           'Bnumber':[],
@@ -43,6 +45,7 @@ def get_genome_info(genome_path):
     return(genome)
     
 def get_genes_from_ranges(rangos, genome):
+    '''Get the genes that should be deleted given the ranges of the genome removed'''
     
     for column in rangos.columns:
         if '_R' in column:
