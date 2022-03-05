@@ -6,6 +6,10 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import matplotlib.ticker as mtick
 import matplotlib.lines as mlines
+import matplotlib as mpl
+
+
+#mpl.rcParams['figure.dpi'] = 100
 
 
 colors_per_strain = {'Δ16':"#E69F00", 'MS56':"#56B4E9", 'MDS69':"#009E73",'MDS42':"#F0E442",'MDS12':"#0072B2",
@@ -39,24 +43,24 @@ def plot_perc_load(prot_load, prot_perc, conditions=None, strains=None, save=Fal
     sns.set()
     sns.set_style("white")
     sns.set_style("ticks")
-    dd=(pd.concat(prot_load,axis=1))
+    plot_data=prot_load
 
         
     if conditions:
-        dd = dd.loc[conditions, :]
+        plot_data = plot_data.loc[conditions, :]
     if strains:
-        dd = dd.loc[:, strains]
+        plot_data = plot_data.loc[:, strains]
         
     colors = []
     markers = []
-    for strain in dd.columns:
+    for strain in plot_data.columns:
         colors.append(mcolors.to_rgb(colors_per_strain[strain]))
         markers.append(markers_per_strain[strain])
         
     english = []
-    for condition in dd.index:
+    for condition in plot_data.index:
         english.append(translate[condition])
-    dd.plot(rot=90, linewidth=0,color=colors,ms=8,style=markers)
+    plot_data.plot(rot=90, linewidth=0, color=colors, ms=10, style=markers)
     
     condiciones = [n+' —          ' for n in english]
     ubicacion = range(0,len(condiciones))
@@ -73,13 +77,13 @@ def plot_perc_load(prot_load, prot_perc, conditions=None, strains=None, save=Fal
     #plt.savefig("./Figuras/"+identifier+"Proteomic_Fentograms_Calculation.pdf", dpi=600, format='pdf', bbox_inches='tight')
     plt.show()
     
-    dd = (pd.concat(prot_perc,axis=0).T)
+    plot_data = prot_perc
     if conditions:
-        dd = dd.loc[conditions, :]
+        plot_data = plot_data.loc[conditions, :]
     if strains:
-        dd = dd.loc[:, strains]
+        plot_data = plot_data.loc[:, strains]
         
-    a = dd.plot(rot=90,linewidth=0, color=colors, style=markers, ms=8)
+    a = plot_data.plot(rot=90,linewidth=0, color=colors, style=markers, ms=10)
     
     condiciones = [n+' —          ' for n in english]
     ubicacion = range(0,len(condiciones))
@@ -96,7 +100,6 @@ def plot_perc_load(prot_load, prot_perc, conditions=None, strains=None, save=Fal
     #if save:
         #plt.savefig("./Figuras/"+identifier+"Proteomic_Percentaje_Calculation.pdf", dpi=600, format='pdf', bbox_inches='tight')
     plt.show()
-
 def plot_distribution(distribucion_prot, tipo, eng=False, save =False, identifier=''):
     
     if tipo =='Promedio' or tipo == 'Average':
@@ -158,3 +161,80 @@ def plot_distribution(distribucion_prot, tipo, eng=False, save =False, identifie
         plt.savefig("./Figuras/"+identifier+"Proteome_Distribution.pdf", dpi=600, format='pdf', bbox_inches='tight')
 
     plt.show()
+
+    
+
+def plot_strain_distribution(info_cepas, distribucion_prot, names, title, tipo, save=False, identifier=''):
+    columna = tipo
+    x_label= -0.8
+    
+    colores = []
+    for strain in names:
+        colores.append(mcolors.to_rgb(colors_per_strain[strain]))
+        
+    fig, axes = plt.subplots(1, 2, figsize=(8,3), dpi=100, sharex=True, sharey=True) #share y y share x
+    
+    for n,ax in enumerate(axes):
+        
+        if n==0:
+            encimadas = [0, 1, 2]
+        if n==1:
+            encimadas = [2, 3]
+        prom_f = []
+        
+        for m in encimadas:
+                x_plot =  distribucion_prot.loc[distribucion_prot.Gen.isin(list(info_cepas[names[n+m]].values)), columna]
+                x_plot = np.log10(x_plot)
+                N, bins, patches = ax.hist(x_plot, alpha=1, bins=15,
+                                           stacked=True, color=colores[n+m],
+                                           linewidth=0.2,label=names[n+m],
+                                           ec='white')
+                
+                
+                suma_restante = 0
+                
+                for i, rect in enumerate(ax.patches[( 15 * (m-(n*2)) ):(15* (m+1-(n*2)) )]):
+                    height = rect.get_height()
+                    x_ax = rect.get_x()
+                    if x_ax >= np.log10(0.1):
+                        a=0
+                    else:
+                        suma_restante+=int(height) 
+                prom_f.append(suma_restante*100/len(x_plot)) 
+                
+                
+        red_line = mlines.Line2D([], [], color='#b80058', ls='--', label= '0.1 fg')
+        handles = [red_line]
+        labels = [h.get_label() for h in handles] 
+        extra = plt.legend(handles=handles, labels=labels, bbox_to_anchor=(x_label, -0.12), fontsize=8)  
+        plt.gca().add_artist(extra)
+        
+        if n == 0:
+            ax.set_ylabel('Gene\nFrequency',fontsize=10)
+            ax.set_title('MG1655', fontsize=10)
+            ax.legend(bbox_to_anchor=(2.63, 1))
+
+        if n==1 and len(names)==5:
+            ax.set_xlabel('$log_{10}$(fg)',fontsize=10)
+            ax.set_title('W3110', fontsize=10)
+            ax.legend(bbox_to_anchor=(1, 0.65))
+
+        ax.xaxis.set_tick_params(labelsize=8)
+        ax.yaxis.set_tick_params(labelsize=8)
+
+        mayores = 100-np.mean(prom_f)
+        ax.annotate(f'{round(np.mean(prom_f),1)}%', xy=(-5, 40), 
+                            xytext=(0, 5), textcoords='offset points', ha='center', va='bottom',fontsize=7.5)
+
+        ax.annotate(f'{round((mayores),1)}%', color='#b80058',
+                    xy=(-0.2, 40), xytext=(0, 5), textcoords='offset points', ha='center', va='bottom',fontsize=7.5) 
+        ax.axvline(np.log10(0.1), color='#b80058',ls='--')
+
+        
+        
+    plt.suptitle('Proteome Distribution in '+title+" Strains ("+translate[tipo]+")",y=1.05,size=12, fontweight='bold')    
+
+    if save:
+        plt.savefig("./"+identifier+"FProteome_Strain_Distribution.pdf", dpi=600, format='pdf', bbox_inches='tight')
+
+    
