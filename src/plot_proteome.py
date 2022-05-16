@@ -7,18 +7,20 @@ import matplotlib.colors as mcolors
 import matplotlib.ticker as mtick
 import matplotlib.lines as mlines
 import matplotlib as mpl
+from IPython.display import display_html
+from itertools import chain,cycle
 
 
 #mpl.rcParams['figure.dpi'] = 100
 
 
-colors_per_strain = {'Δ16':"#E69F00", 'MS56':"#56B4E9", 'MDS69':"#009E73",'MDS42':"#F0E442",'MDS12':"#0072B2",
-                      'DGF298':"#D55E00", 'DGF327':"#CC79A7", 'MGF02':"#bdbdbd", 'MGF01':"#878500"}
+colors_per_strain = {'Δ16':"#FFB000", 'MS56':"#648FFF", 'MDS69':"#8DCA3F",'MDS42':"#F0E442",'MDS12':"#0072B2",
+                      'DGF298':"#FF3B9B", 'DGF327':"#CC79A7", 'MGF02':"#7D69DC", 'MGF01':"#878500"}
 markers_per_strain = {'Δ16':'--o', 'MS56':'--o', 'MDS69':'--o','MDS42':'--o','MDS12':'--o',
                       'DGF298':'--s', 'DGF327':'--s', 'MGF02':'--s', 'MGF01':'--s'}
 
 
-colors_distribution = ["#E69F00", "#56B4E9"]
+colors_distribution = ["#EF8D48", "#FE6100"]
 colors_distribution = [mcolors.to_rgb(color) for color in colors_distribution ]
 
 english_cond = ["LB","Glycerol + AA","42°C Glucose","Fructose","pH6 Glucose",
@@ -35,9 +37,17 @@ spanish_cond = ["LB","Glicerol + AA","42°C glucosa","Fructosa","pH6 glucosa",
 translate = dict(zip(spanish_cond, english_cond))
 
 
+def display_side_by_side(*args, titles=cycle([''])):
+    html_str=''
+    for df,title in zip(args, chain(titles,cycle(['</br>'])) ):
+        html_str+='<th style="text-align:center"><td style="vertical-align:top">'
+        html_str+=f'<h2>{title}</h2>'
+        html_str+=df.to_html().replace('table','table style="display:inline"')
+        html_str+='</td></th>'
+    display_html(html_str,raw=True)
 
 
-def plot_perc_load(prot_load, prot_perc, conditions=None, strains=None, save=False, identifier=''):
+def plot_perc_load(prot_load, prot_perc, conditions=None, strains=None, save=False, identifier='', colors_per_strain=colors_per_strain):
     labelsize = 16
 #     ticksize=24
     sns.set()
@@ -100,7 +110,7 @@ def plot_perc_load(prot_load, prot_perc, conditions=None, strains=None, save=Fal
     #if save:
         #plt.savefig("./Figuras/"+identifier+"Proteomic_Percentaje_Calculation.pdf", dpi=600, format='pdf', bbox_inches='tight')
     plt.show()
-def plot_distribution(distribucion_prot, tipo, eng=False, save =False, identifier=''):
+def plot_distribution(distribucion_prot, tipo, eng=False, save =False, identifier='', colors_distribution = colors_distribution):
     
     if tipo =='Promedio' or tipo == 'Average':
         columna = tipo
@@ -164,7 +174,7 @@ def plot_distribution(distribucion_prot, tipo, eng=False, save =False, identifie
 
     
 
-def plot_strain_distribution(info_cepas, distribucion_prot, names, title, tipo, save=False, identifier=''):
+def plot_strain_distribution(info_cepas, distribucion_prot, names, title, tipo, save=False, identifier='', colors_per_strain=colors_per_strain):
     columna = tipo
     x_label= -0.8
     
