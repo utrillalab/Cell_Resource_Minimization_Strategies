@@ -40,7 +40,6 @@ def plot_ME_energy(names, consumo, consumo_per):
     N = len(names[0:5])
 
     ind = np.arange(N)    # the x locations for the groups
-    print(N)
     if N==4:
         width = 0.45       # the width of the bars: can also be len(x) sequence
     elif N==5:
