@@ -181,3 +181,41 @@ def get_energy_per_gene(energy_consumption, me):
         totales[bnumber] = genes_met.get(bnumber, 0) + elegidos_trad.loc[trans_bnumber] + genes_transcription.get(bnumber, 0)
         
     return(totales)
+
+
+
+def get_energy_ME_proteome(strains, genes_finales, proteomic_data, replication_cost, transcription_tcost, upf_cost ):
+    costos_calclulados = { }
+    for cepa in strains:
+        T_replication_cost = 0
+        T_transcription_gcost = 0
+        T_transcription_tcost = 0
+        T_upf_cost = 0
+
+        for gen_info in genes_finales[cepa].iterrows():
+            gen_name = gen_info[1].Bnumber 
+            if gen_name is not np.nan: 
+                largo_gen = gen_info[1].Length
+                largo_gen = largo_gen/(1*10**6)
+                if gen_name in list(proteomic_data.Bnumber):
+                    fg_gen = proteomic_data[proteomic_data.Bnumber==gen_name].Glucosa
+                    perc_gen = fg_gen *100/ proteomic_data.Glucosa.sum()
+                    perc_gen = perc_gen.values[0]
+                else:
+                    perc_gen = 0
+                T_replication_cost += replication_cost*largo_gen
+        #             T_transcription_gcost += transcription_gcost*largo_gen
+                T_transcription_tcost += transcription_tcost*largo_gen
+                T_upf_cost += upf_cost*perc_gen
+            else:
+                continue
+    #             print(gen)
+        costos_calclulados[cepa] = {'Replication': T_replication_cost,
+    #                                'transcription_g': T_transcription_gcost,
+                                   'Transcription': T_transcription_tcost,
+                                   'UPF': T_upf_cost,
+                                   'Total': T_replication_cost + 
+                                    T_transcription_tcost +
+                                    T_upf_cost
+                                   }
+    return(costos_calclulados)

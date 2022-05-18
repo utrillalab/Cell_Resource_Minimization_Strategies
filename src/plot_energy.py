@@ -6,11 +6,11 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 
 
-colors = ["#FFB700",
-"#648FFF",
-"#82B541",
-"#CC002D",
-"#9B5EF0",]
+colors = ["#FAB611",
+"#6986C3",
+"#81B540",
+"#CC1330",
+"#7760A7",]
 
 new_colors = list(map(lambda x: mcolors.to_rgb(x), colors))
 colors=new_colors
@@ -85,7 +85,7 @@ def plot_glc_ox_atp(consumption_me,modelos):
 
     fig, ax1 = plt.subplots()
 
-    color = '#CC002D'
+    color = '#CC1330'
     ax1.set_xlabel('UPF',fontsize=16,fontweight='bold')
     ax1.set_ylabel('Consumo de ATP\n $mmol•gDW^{-1}•h^{-1}$', color=color,\
                   fontsize=16,fontweight='bold')
@@ -96,12 +96,12 @@ def plot_glc_ox_atp(consumption_me,modelos):
 
     ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
 
-    color = '#648FFF'
+    color = '#6986C3'
     ax2.set_ylabel('Consumo de\noxígeno y glucosa\n $mmol•gDW^{-1}•h^{-1}$', color='black',\
                   fontsize=16,fontweight='bold')  # we already handled the x-label with ax1
 
     lb2 = ax2.plot(*zip(*glucosa.sort_index().items()), color=color,marker='o',markersize=8, label = 'Glucosa')
-    color='#82B541'
+    color='#81B540'
     lb3 = ax2.plot(*zip(*oxigeno.sort_index().items()), color=color,marker='o',markersize=8, label = 'Oxígeno')
 
     ax2.tick_params(axis='y', labelcolor='black')
@@ -115,4 +115,88 @@ def plot_glc_ox_atp(consumption_me,modelos):
     leg = lb1 + lb2 + lb3
     labs = [l.get_label() for l in leg]
     ax1.legend(leg, labs,loc='center left', bbox_to_anchor=(1.25, 0.5))
+    plt.show()
+    
+    
+def plot_energy_ME_proteome(names, aportaciones, leyendas, medio, colores=colors,  normalizado=False, eng= False, save=False, identifier=''):
+    fig, ax = plt.subplots(figsize=(10,4))
+    total_energia_producida =58.88321141277835
+
+    labelsize =16
+    N = len(names)
+
+    ind = np.arange(N)    # the x locations for the groups
+    if N==4:
+        width = 0.45       # the width of the bars: can also be len(x) sequence
+    elif N==5:
+        width = 0.5
+    elif N==9:
+        width = 0.75
+    
+        
+    p1 = ax.bar(ind*1.2, aportaciones.T.loc[names,'UPF'], width, linewidth=0, color=colores[1])
+    p2 = ax.bar(ind*1.2, aportaciones.T.loc[names,'Transcription'], width, linewidth=0,
+                bottom=aportaciones.T.loc[names,'UPF'], color=colores[0])
+    p3 = ax.bar(ind*1.2, aportaciones.T.loc[names,'Replication'], width, linewidth=0,
+                 bottom=[sum(x) for x in zip(aportaciones.T.loc[names,'UPF'],aportaciones.T.loc[names,'Transcription'])], color=colores[3])
+
+    if normalizado == True:
+        if eng:
+            plt.ylabel('Percentage', fontsize=labelsize-2)
+            normal = ' Normalized'
+        else:
+            plt.ylabel('Porcentaje', fontsize=labelsize-2)
+            normal = ' normalizada'
+    elif normalizado ==False:
+        if eng:
+            ax.tick_params( labelsize=labelsize-4)
+            ax.set_ylabel('Released ATP\n$mmol•gDW^{-1}•h^{-1}$', fontsize=labelsize-2)
+            normal = ''
+            
+            ax2 = ax.twinx()
+            ax2.set_ylim( (ax.get_ylim()[0]*100/total_energia_producida,
+                        ax.get_ylim()[1]*100/total_energia_producida))
+            
+            ax2.tick_params( labelsize=labelsize-4)
+#             ax2.bar(ind*1.2, valores_p, width, color=colors, tick_label=names)
+
+
+           
+        else:
+            normal = ''
+            ax.tick_params( labelsize=labelsize-4)
+            ax.set_ylabel('Liberación de ATP\n$mmol•gDW^{-1}•h^{-1}$', fontsize=labelsize-2)
+            normal = ''
+            
+            ax2 = ax.twinx()
+            ax2.set_ylim( (ax.get_ylim()[0]*100/total_energia_producida,
+                        ax.get_ylim()[1]*100/total_energia_producida))
+            
+            ax2.tick_params( labelsize=labelsize-4)
+#             ax2.bar(ind*1.2, valores_p, width, color=colors, tick_label=names)
+    
+    if eng:
+        plt.title('Released Energy'+normal+" ("+medio+")", fontweight='bold' ,fontsize=labelsize)
+    else:
+        plt.title('Energía liberada'+normal+" en medio de glucosa según\ncálculos del modelo ME y datos proteómicos", fontweight='bold' ,fontsize=labelsize)
+    
+    
+    add_line_MG(ax2, -.1, 0.05)
+    add_line_W3(ax2, -.1, 0.57)
+
+    ax2.text((0.05+.48)/2, -0.17, 'MG1655', transform=ax2.transAxes, fontsize=12) 
+    ax2.text((0.57)*1.28, -0.17, 'W3110', transform=ax2.transAxes, fontsize=12) 
+    
+    plt.xticks(ind*1.2, tuple(names), fontsize=labelsize-2)
+    plt.yticks(fontsize=labelsize-4)
+#     plt.legend((p1[0], p2[0], p3[0]), tuple(leyendas), bbox_to_anchor=(1.5, 1))
+    plt.legend((p1[0], p2[0], p3[0]), tuple(leyendas), bbox_to_anchor=(1.7, 1), ncol=3)
+    if normalizado ==True:
+        plt.gca().set_yticklabels(['{:.0f}%'.format(x) for x in plt.gca().get_yticks()]) 
+        
+    print(ax.get_ylim(), ax2.get_ylim())
+    plt.gca().set_yticklabels(['{:.1f}%'.format((x)) for x in plt.gca().get_yticks()]) 
+
+    if save:
+        plt.savefig("./"+identifier+"Released_Energy.pdf", dpi=600, format='pdf', bbox_inches='tight')
     plt.show()
