@@ -1,4 +1,6 @@
 import numpy as np
+import pandas as pd
+
 
 def get_energy_consumption_production(me):
     atp_c = me.metabolites.get_by_id('atp_c')
@@ -31,12 +33,23 @@ def get_energy_consumption_production(me):
                     consume_atp=True
                 elif atp_value>0:
                     produce_atp = True
+            if gtp_c in reaction.products: 
 
+                if "mu" in str(reaction.get_coefficient('gtp_c')):
+                    gtp_value =eval(str(  (reaction.get_coefficient('gtp_c'))  )) 
+                else:
+                    gtp_value = reaction.get_coefficient('gtp_c')
+
+                if reaction.metabolites[gtp_c]<0:
+                    consume_gtp=True
+                elif reaction.metabolites[gtp_c]>0:
+                    produce_gtp = True
+                    
     #       if reaction.x > 0:
     #          print(reaction.id,reaction.x)
     #       reactions_energy_production['Reactions']={"atp":atp_value,"gtp":gtp_value,"Total":atp_value+gtp_value,\
     #                                     "Usada":reaction.x*atp_value+gtp_value,"Tipo":type(reaction).__name__}
-            if (produce_atp) and reaction.x > 0:
+            if (produce_atp or produce_gtp) and reaction.x > 0:
                 reactions_energy_production['Reactions'].append((reaction))
                 reactions_energy_production['Type'].append((type(reaction).__name__))
                 reactions_energy_production['Total'].append((atp_value))
@@ -49,6 +62,31 @@ def get_energy_consumption_production(me):
                 reactions_energy_consumption['Used'].append((reaction.x*(atp_value)))
                 reactions_energy_consumption['ATP'].append((atp_value))
     return(reactions_energy_consumption,reactions_energy_production)
+
+def energy_per_model(modelos, group=False):
+    production_me = []
+    consumption_me = {}
+    consumption_me_group = {}
+    consumption_perc = [] 
+
+    for modelo in modelos:
+        reactions_energy_consumption,reactions_energy_production = get_energy_consumption_production(modelos[modelo])
+        #Production
+        energy_production = pd.DataFrame.from_dict(reactions_energy_production).set_index('Reactions')
+        production_me.append(energy_production.sum().Used)
+        #Consumption
+        energy_consumption = pd.DataFrame.from_dict(reactions_energy_consumption).set_index('Reactions')
+        type_group_consumption = energy_consumption.Used.groupby(energy_consumption.Type)
+        
+        consumption_me_group['me'+modelo] = (abs(type_group_consumption.sum()))
+        consumption_me['me'+modelo] = (abs(type_group_consumption.sum()).sum())
+        
+    if group:
+        return(consumption_me, consumption_me_group, production_me)
+    else:
+        return(consumption_me, production_me)
+
+
 
 def get_energy_per_gene(energy_consumption, me):
     
