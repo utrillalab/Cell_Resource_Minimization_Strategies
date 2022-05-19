@@ -7,6 +7,9 @@ import matplotlib.colors as mcolors
 import matplotlib.ticker as mtick
 import matplotlib.lines as mlines
 import matplotlib as mpl
+from mpl_toolkits.axes_grid.inset_locator import inset_axes
+
+
 from IPython.display import display_html
 from itertools import chain,cycle
 
@@ -19,9 +22,12 @@ colors_per_strain = {'Δ16':"#FFB000", 'MS56':"#648FFF", 'MDS69':"#8DCA3F",'MDS4
 markers_per_strain = {'Δ16':'--o', 'MS56':'--o', 'MDS69':'--o','MDS42':'--o','MDS12':'--o',
                       'DGF298':'--s', 'DGF327':'--s', 'MGF02':'--s', 'MGF01':'--s'}
 
-
 colors_distribution = ["#EF8D48", "#FE6100"]
 colors_distribution = [mcolors.to_rgb(color) for color in colors_distribution ]
+
+forma = ['X','o','o','o','s','s']
+
+
 
 english_cond = ["LB","Glycerol + AA","42°C Glucose","Fructose","pH6 Glucose",
                "Glucose","Osmotic-stress Glucose","Xylose","Chemostat µ=0.5",
@@ -247,4 +253,62 @@ def plot_strain_distribution(info_cepas, distribucion_prot, names, title, tipo, 
     if save:
         plt.savefig("./"+identifier+"FProteome_Strain_Distribution.pdf", dpi=600, format='pdf', bbox_inches='tight')
 
+        
+
+def plot_gen_vs_prot(prot_vs_genome_df, forma=forma, colors=None):
+
+    if not(colors):
+        colors = ["#D55E00",
+            "#FAB611",
+            "#6986C3",
+            "#81B540",
+            "#CC1330",
+            "#7760A7"]
+        colors = list(map(lambda x: mcolors.to_rgb(x), colors))
+    
+    x = prot_vs_genome_df.Genome
+    y = prot_vs_genome_df.Proteome
+    classes = prot_vs_genome_df.Proteome.index
+    
+    fig, ax =  plt.subplots()
+    for i in range(6): #for each of the 7 features 
+        mi = forma[i] #marker for ith feature 
+        xi = x[i] #x array for ith feature .. here is where you would generalize      different x for every feature
+        yi = y[i] #y array for ith feature 
+        ci = colors[i] #color for ith feature 
+        size=150
+        if mi == 'P':
+            size = 100
+        if mi == '*':
+            size = 150
+        ax.scatter(xi,yi,marker=mi, color=ci,s=size,label=classes[i])
+
+    
+    plt.plot([0,36],[0,36],color='gray',ls='--')
+    # sns.despine()
+
+    plt.xlabel(' ΔGenome',fontsize=18,fontweight='bold')
+    plt.ylabel(' ΔProteome',fontsize=18,fontweight='bold')
+
+    plt.xticks([n for n in range(0,36,5)], [str(n)+'%' for n in range(0,36,5)])
+    plt.yticks([n for n in range(0,36,5)], [str(n)+'%' for n in range(0,36,5)])
+    plt.xticks(fontsize=14)#, rotation=90)
+    plt.yticks(fontsize=14)
+
+    plt.legend(bbox_to_anchor=(1.05, 1.02), loc='upper left', prop={'size': 14})
+    
+    
+    ax_ins = inset_axes(ax,width="50%",
+                           height=1,
+                           loc='upper left',
+                           bbox_to_anchor=(0.14,0.35,0.6,0.6),bbox_transform = ax.transAxes)
+
+    plt.plot(x[0],y[0],marker=forma[0],ms=12, color = colors[0])
+    plt.plot([0,0.50],[0,0.5],color='gray',ls='--')
+    plt.xlim(-0.05,0.5)
+    
+    plt.xticks([0,0.5],['0.004%\n3 TFs','0.5%'])
+    plt.yticks([0,0.22,0.44],['0%','0.22%','0.44%'])
+
+    plt.show()
     
