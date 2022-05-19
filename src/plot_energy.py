@@ -118,7 +118,7 @@ def plot_glc_ox_atp(consumption_me,modelos):
     plt.show()
     
     
-def plot_energy_ME_proteome(names, aportaciones, leyendas, medio, colores=colors,  normalizado=False, eng= False, save=False, identifier=''):
+def plot_energy_ME_proteome(names, aportaciones, leyendas, medio, colores=colors,  normalizado=False, eng= True, save=False, identifier=''):
     fig, ax = plt.subplots(figsize=(10,4))
     total_energia_producida =58.88321141277835
 
@@ -132,21 +132,27 @@ def plot_energy_ME_proteome(names, aportaciones, leyendas, medio, colores=colors
         width = 0.5
     elif N==9:
         width = 0.75
-    
+    if normalizado:
+        UPF_val = aportaciones.T.loc[names,'UPF']*100/aportaciones.T.loc[names,'Total']
+        Trans_val = aportaciones.T.loc[names,'Transcription']*100/aportaciones.T.loc[names,'Total']
+        Repli_val = aportaciones.T.loc[names,'Replication']*100/aportaciones.T.loc[names,'Total']
         
-    p1 = ax.bar(ind*1.2, aportaciones.T.loc[names,'UPF'], width, linewidth=0, color=colores[1])
-    p2 = ax.bar(ind*1.2, aportaciones.T.loc[names,'Transcription'], width, linewidth=0,
-                bottom=aportaciones.T.loc[names,'UPF'], color=colores[0])
-    p3 = ax.bar(ind*1.2, aportaciones.T.loc[names,'Replication'], width, linewidth=0,
-                 bottom=[sum(x) for x in zip(aportaciones.T.loc[names,'UPF'],aportaciones.T.loc[names,'Transcription'])], color=colores[3])
+    else: 
+        UPF_val = aportaciones.T.loc[names,'UPF']
+        Trans_val = aportaciones.T.loc[names,'Transcription']
+        Repli_val = aportaciones.T.loc[names,'Replication']
+        
+    p1 = ax.bar(ind*1.2, UPF_val, width, linewidth=0, color=colores[1])
+    p2 = ax.bar(ind*1.2, Trans_val, width, linewidth=0,
+                bottom=UPF_val, color=colores[0])
+    p3 = ax.bar(ind*1.2, Repli_val, width, linewidth=0,
+                 bottom=[sum(x) for x in zip(UPF_val,Trans_val)], color=colores[3])
 
-    if normalizado == True:
+    if normalizado:
         if eng:
             plt.ylabel('Percentage', fontsize=labelsize-2)
             normal = ' Normalized'
-        else:
-            plt.ylabel('Porcentaje', fontsize=labelsize-2)
-            normal = ' normalizada'
+
     elif normalizado ==False:
         if eng:
             ax.tick_params( labelsize=labelsize-4)
@@ -158,43 +164,32 @@ def plot_energy_ME_proteome(names, aportaciones, leyendas, medio, colores=colors
                         ax.get_ylim()[1]*100/total_energia_producida))
             
             ax2.tick_params( labelsize=labelsize-4)
-#             ax2.bar(ind*1.2, valores_p, width, color=colors, tick_label=names)
-
-
-           
-        else:
-            normal = ''
-            ax.tick_params( labelsize=labelsize-4)
-            ax.set_ylabel('Liberación de ATP\n$mmol•gDW^{-1}•h^{-1}$', fontsize=labelsize-2)
-            normal = ''
-            
-            ax2 = ax.twinx()
-            ax2.set_ylim( (ax.get_ylim()[0]*100/total_energia_producida,
-                        ax.get_ylim()[1]*100/total_energia_producida))
-            
-            ax2.tick_params( labelsize=labelsize-4)
-#             ax2.bar(ind*1.2, valores_p, width, color=colors, tick_label=names)
     
     if eng:
         plt.title('Released Energy'+normal+" ("+medio+")", fontweight='bold' ,fontsize=labelsize)
-    else:
-        plt.title('Energía liberada'+normal+" en medio de glucosa según\ncálculos del modelo ME y datos proteómicos", fontweight='bold' ,fontsize=labelsize)
-    
-    
-    add_line_MG(ax2, -.1, 0.05)
-    add_line_W3(ax2, -.1, 0.57)
 
-    ax2.text((0.05+.48)/2, -0.17, 'MG1655', transform=ax2.transAxes, fontsize=12) 
-    ax2.text((0.57)*1.28, -0.17, 'W3110', transform=ax2.transAxes, fontsize=12) 
+
+    if normalizado == True:      
+        add_line_MG(ax, -.1, 0.05)
+        add_line_W3(ax, -.1, 0.57)
+        ax.text((0.05+.48)/2, -0.17, 'MG1655', transform=ax.transAxes, fontsize=12) 
+        ax.text((0.57)*1.28, -0.17, 'W3110', transform=ax.transAxes, fontsize=12) 
+        xtick_labelsize = labelsize-4
+    else:
+        add_line_MG(ax2, -.1, 0.05)
+        add_line_W3(ax2, -.1, 0.57)
+        ax2.text((0.05+.48)/2, -0.17, 'MG1655', transform=ax2.transAxes, fontsize=12) 
+        ax2.text((0.57)*1.28, -0.17, 'W3110', transform=ax2.transAxes, fontsize=12) 
+        xtick_labelsize = labelsize-2
     
-    plt.xticks(ind*1.2, tuple(names), fontsize=labelsize-2)
-    plt.yticks(fontsize=labelsize-4)
-#     plt.legend((p1[0], p2[0], p3[0]), tuple(leyendas), bbox_to_anchor=(1.5, 1))
-    plt.legend((p1[0], p2[0], p3[0]), tuple(leyendas), bbox_to_anchor=(1.7, 1), ncol=3)
+    
+    plt.xticks(ind*1.2, tuple(names), fontsize= xtick_labelsize)
+    plt.yticks(fontsize=xtick_labelsize)
+    plt.legend((p1[0], p2[0], p3[0]), tuple(leyendas), bbox_to_anchor=(1.3, 1))
     if normalizado ==True:
         plt.gca().set_yticklabels(['{:.0f}%'.format(x) for x in plt.gca().get_yticks()]) 
         
-    print(ax.get_ylim(), ax2.get_ylim())
+    #print(ax.get_ylim(), ax2.get_ylim())
     plt.gca().set_yticklabels(['{:.1f}%'.format((x)) for x in plt.gca().get_yticks()]) 
 
     if save:
