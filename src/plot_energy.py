@@ -72,9 +72,16 @@ def plot_ME_energy(names, consumo, consumo_per):
     
     
     
-def plot_glc_ox_atp(consumption_me,modelos):
+def plot_glc_ox_atp(consumption_me, modelos, tipo):
     ''' Gráfica de consumo de energía con los ejes de consumo de glucosa y oxígeno'''
     
+    if tipo=='Replication':
+        title = "Increase of DNA Percentage in Cell"
+    elif tipo == 'Transcription':
+        title = "Increase of Transcribed Genes"
+    elif tipo == 'UPF':
+        title = "UPF"
+        
     valores_metabolicos = pd.DataFrame({key:modelos[key].get_metabolic_flux() for key in modelos.keys()})
     glucosa = valores_metabolicos.loc['EX_glc__D_e'].sort_index()*(-1)
     oxigeno = valores_metabolicos.loc['EX_o2_e'].sort_index()*(-1)
@@ -86,8 +93,8 @@ def plot_glc_ox_atp(consumption_me,modelos):
     fig, ax1 = plt.subplots()
 
     color = '#CC1330'
-    ax1.set_xlabel('UPF',fontsize=16,fontweight='bold')
-    ax1.set_ylabel('Consumo de ATP\n $mmol•gDW^{-1}•h^{-1}$', color=color,\
+    ax1.set_xlabel(title, fontsize=16, fontweight='bold')
+    ax1.set_ylabel('ATP Consumption\n $mmol•gDW^{-1}•h^{-1}$', color=color,\
                   fontsize=16,fontweight='bold')
 
     lb1 = ax1.plot(*zip(*sorted(consumption_me.items())), color=color,marker='o',markersize=8, label = 'ATP')
@@ -97,12 +104,12 @@ def plot_glc_ox_atp(consumption_me,modelos):
     ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
 
     color = '#6986C3'
-    ax2.set_ylabel('Consumo de\noxígeno y glucosa\n $mmol•gDW^{-1}•h^{-1}$', color='black',\
+    ax2.set_ylabel('Oxygen and Glucose\nConsumption\n $mmol•gDW^{-1}•h^{-1}$', color='black',\
                   fontsize=16,fontweight='bold')  # we already handled the x-label with ax1
 
-    lb2 = ax2.plot(*zip(*glucosa.sort_index().items()), color=color,marker='o',markersize=8, label = 'Glucosa')
+    lb2 = ax2.plot(*zip(*glucosa.sort_index().items()), color=color,marker='o',markersize=8, label = 'Glucose')
     color='#81B540'
-    lb3 = ax2.plot(*zip(*oxigeno.sort_index().items()), color=color,marker='o',markersize=8, label = 'Oxígeno')
+    lb3 = ax2.plot(*zip(*oxigeno.sort_index().items()), color=color,marker='o',markersize=8, label = 'Oxygen')
 
     ax2.tick_params(axis='y', labelcolor='black')
 
