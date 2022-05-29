@@ -31,7 +31,7 @@ def plot_type_energy(energy_consumption, energy_production):
     type_group_consumption = energy_consumption.Used.groupby(energy_consumption.Type)
     type_group_production=energy_production.Used.groupby(energy_production.Type)
     energia_producida = float(type_group_production.sum().values)
-    no_usada = energia_producida + type_group_consumption.sum().sum()
+    no_usada = energia_producida - type_group_consumption.sum().sum()
     nueva_info=type_group_consumption.sum().append(pd.Series([no_usada], index=['Other']))
     nueva_info=abs(nueva_info)
 
