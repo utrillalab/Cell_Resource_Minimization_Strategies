@@ -49,12 +49,12 @@ def get_energy_consumption_production(me):
     #          print(reaction.id,reaction.x)
     #       reactions_energy_production['Reactions']={"atp":atp_value,"gtp":gtp_value,"Total":atp_value+gtp_value,\
     #                                     "Usada":reaction.x*atp_value+gtp_value,"Tipo":type(reaction).__name__}
-            if (produce_atp or produce_gtp) and reaction.x > 0:
+            if (produce_atp) and reaction.x > 0:
                 reactions_energy_production['Reactions'].append((reaction))
                 reactions_energy_production['Type'].append((type(reaction).__name__))
                 reactions_energy_production['Used'].append((reaction.x*(atp_value)))
                 reactions_energy_production['ATP'].append((atp_value))
-            elif (consume_atp) and reaction.x > 0:
+            elif (consume_atp) and reaction.x and not produce_gtp> 0:
                 reactions_energy_consumption['Reactions'].append(str(reaction))
                 reactions_energy_consumption['Type'].append((type(reaction).__name__))
                 reactions_energy_consumption['Used'].append((reaction.x*(atp_value)))
