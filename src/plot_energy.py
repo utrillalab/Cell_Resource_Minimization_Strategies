@@ -26,6 +26,37 @@ def add_line_W3(ax, xpos, ypos):
     line.set_clip_on(False)
     ax.add_line(line)
     
+    
+def plot_type_energy(energy_consumption, energy_production):
+    type_group_consumption = energy_consumption.Used.groupby(energy_consumption.Type)
+    type_group_production=energy_production.Used.groupby(energy_production.Type)
+    energia_producida = float(type_group_production.sum().values)
+    no_usada = energia_producida + type_group_consumption.sum().sum()
+    nueva_info=type_group_consumption.sum().append(pd.Series([no_usada], index=['Other']))
+    nueva_info=abs(nueva_info)
+
+
+    labels =list(nueva_info.index)
+    sizes = list(abs(nueva_info.values))
+    #colors
+    colors = ['#CC1330','#6986C3','#FAB611','#7760A7','#6986C3','#6986C3','#81B540']
+    explode = (0.05,0.05,0.05,0.05,0.05,0.05,0.05,)
+
+    fig1, ax1 = plt.subplots()
+
+    ax1.pie(sizes, colors = colors, labels=labels, autopct='%0.01f%%',
+            startangle=90, pctdistance=0.5, explode = explode)
+
+    #draw circle
+    centre_circle = plt.Circle((0,0),0.70,fc='white')
+    fig = plt.gcf()
+    fig.gca().add_artist(centre_circle)
+    # Equal aspect ratio ensures that pie is drawn as a circle
+    ax1.axis('equal')  
+    plt.tight_layout()
+    plt.show()
+
+    
 def plot_ME_energy(names, consumo, consumo_per):
     
     fig, ax1 = plt.subplots(figsize=(10,4))
@@ -127,7 +158,7 @@ def plot_glc_ox_atp(consumption_me, modelos, tipo):
     
 def plot_energy_ME_proteome(names, aportaciones, leyendas, medio, colores=colors,  normalizado=False, eng= True, save=False, identifier=''):
     fig, ax = plt.subplots(figsize=(10,4))
-    total_energia_producida =58.88321141277835
+    total_energia_producida = 68.89022155075351
 
     labelsize =16
     N = len(names)
