@@ -255,7 +255,7 @@ def plot_strain_distribution(info_cepas, distribucion_prot, names, title, tipo, 
 
         
 
-def plot_gen_vs_prot(prot_vs_genome_df, forma=forma, colors=None):
+def plot_gen_vs_prot(prot_vs_genome_df, forma=forma, colors=None, save=False):
 
     if not(colors):
         colors = ["#D55E00",
@@ -309,6 +309,9 @@ def plot_gen_vs_prot(prot_vs_genome_df, forma=forma, colors=None):
     
     plt.xticks([0,0.5],['0.004%\n3 TFs','0.5%'])
     plt.yticks([0,0.22,0.44],['0%','0.22%','0.44%'])
-
+    
+    if save:
+        plt.savefig("./Prot_vs_Genome.pdf", dpi=600, format='pdf', bbox_inches='tight')
+        
     plt.show()
     
