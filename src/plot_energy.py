@@ -185,6 +185,9 @@ def plot_energy_ME_proteome(names, aportaciones, leyendas, medio, colores=colors
                 bottom=UPF_val, color=colores[0])
     p3 = ax.bar(ind*1.2, Repli_val, width, linewidth=0,
                  bottom=[sum(x) for x in zip(UPF_val,Trans_val)], color=colores[3])
+    
+    bars = p1 + p2 + p3
+    
 
     if normalizado:
         if eng:
@@ -226,6 +229,11 @@ def plot_energy_ME_proteome(names, aportaciones, leyendas, medio, colores=colors
     plt.legend((p1[0], p2[0], p3[0]), tuple(leyendas), bbox_to_anchor=(1.3, 1))
     if normalizado ==True:
         plt.gca().set_yticklabels(['{:.0f}%'.format(x) for x in plt.gca().get_yticks()]) 
+        
+    patterns = [None]*3+['/']*2+[None, '/']*2
+    patterns = patterns*3
+    for bar, pattern in zip(bars, patterns):
+        bar.set_hatch(pattern)    
         
     #print(ax.get_ylim(), ax2.get_ylim())
     plt.gca().set_yticklabels(['{:.1f}%'.format((x)) for x in plt.gca().get_yticks()]) 
