@@ -16,13 +16,21 @@ new_colors = list(map(lambda x: mcolors.to_rgb(x), colors))
 colors=new_colors
 
 
-def add_line_MG(ax, xpos, ypos):
-    line = plt.Line2D([ypos, ypos+ .48], [xpos, xpos], color='black', transform=ax.transAxes)
+def add_line_MG(ax, xpos, ypos, N):
+    if N==9:
+        MG_add = .48
+    else:
+        MG_add= .45
+    line = plt.Line2D([ypos, ypos+ MG_add], [xpos, xpos], color='black', transform=ax.transAxes)
     line.set_clip_on(False)
     ax.add_line(line)
 
-def add_line_W3(ax, xpos, ypos):
-    line = plt.Line2D([ypos, ypos+ .39], [xpos, xpos], color='black', transform=ax.transAxes)
+def add_line_W3(ax, xpos, ypos, N):
+    if N==9:
+        W3_add = .39
+    else:
+        W3_add = 0.36
+    line = plt.Line2D([ypos, ypos+ W3_add], [xpos, xpos], color='black', transform=ax.transAxes)
     line.set_clip_on(False)
     ax.add_line(line)
     
@@ -89,8 +97,8 @@ def plot_ME_energy(names, consumo, consumo_per):
     ax2.bar(ind*1.2, valores_p[0:5], width, color=colors[0:5], tick_label=names[0:5])
     ax2.tick_params(labelsize=labelsize-4)
 
-    add_line_MG(ax2, -.1, 0.05)
-    add_line_W3(ax2, -.1, 0.57)
+    add_line_MG(ax2, -.1, 0.05, N)
+    add_line_W3(ax2, -.1, 0.57, N)
 
     ax2.text((0.05+.48)/2, -0.17, 'MG1655', transform=ax2.transAxes, fontsize=12) 
     ax2.text((0.57)*1.28, -0.17, 'W3110', transform=ax2.transAxes, fontsize=12) 
@@ -170,6 +178,12 @@ def plot_energy_ME_proteome(names, aportaciones, leyendas, medio, colores=colors
         width = 0.5
     elif N==9:
         width = 0.75
+        patterns = [None]*3+['/']*2+[None, '/']*2
+
+    elif N==10:
+        width = 0.8
+        patterns = [None]*4+['/']*2+[None, '/']*2
+        
     if normalizado:
         UPF_val = aportaciones.T.loc[names,'UPF']*100/aportaciones.T.loc[names,'Total']
         Trans_val = aportaciones.T.loc[names,'Transcription']*100/aportaciones.T.loc[names,'Total']
@@ -209,16 +223,15 @@ def plot_energy_ME_proteome(names, aportaciones, leyendas, medio, colores=colors
     if eng:
         plt.title('Released Energy'+normal+" ("+medio+")", fontweight='bold' ,fontsize=labelsize)
 
-
     if normalizado == True:      
-        add_line_MG(ax, -.1, 0.05)
-        add_line_W3(ax, -.1, 0.57)
+        add_line_MG(ax, -.1, 0.05, N)
+        add_line_W3(ax, -.1, 0.57, N)
         ax.text((0.05+.48)/2, -0.17, 'MG1655', transform=ax.transAxes, fontsize=12) 
         ax.text((0.57)*1.28, -0.17, 'W3110', transform=ax.transAxes, fontsize=12) 
         xtick_labelsize = labelsize-4
     else:
-        add_line_MG(ax2, -.1, 0.05)
-        add_line_W3(ax2, -.1, 0.57)
+        add_line_MG(ax2, -.1, 0.13, N)
+        add_line_W3(ax2, -.1, 0.6, N)
         ax2.text((0.05+.48)/2, -0.17, 'MG1655', transform=ax2.transAxes, fontsize=12) 
         ax2.text((0.57)*1.28, -0.17, 'W3110', transform=ax2.transAxes, fontsize=12) 
         xtick_labelsize = labelsize-2
@@ -230,7 +243,6 @@ def plot_energy_ME_proteome(names, aportaciones, leyendas, medio, colores=colors
     if normalizado ==True:
         plt.gca().set_yticklabels(['{:.0f}%'.format(x) for x in plt.gca().get_yticks()]) 
         
-    patterns = [None]*3+['/']*2+[None, '/']*2
     patterns = patterns*3
     for bar, pattern in zip(bars, patterns):
         bar.set_hatch(pattern)    

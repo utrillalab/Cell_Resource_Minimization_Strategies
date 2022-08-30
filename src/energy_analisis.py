@@ -219,3 +219,35 @@ def get_energy_ME_proteome(strains, genes_finales, proteomic_data, replication_c
                                     T_upf_cost
                                    }
     return(costos_calclulados)
+
+
+def get_energy_PFC(strains, reduced, replication_cost, transcription_tcost, upf_cost ):
+    costos_calclulados = { }
+    for cepa in strains:
+        T_replication_cost = 0
+        T_transcription_gcost = 0
+        T_transcription_tcost = 0
+        T_upf_cost = 0
+
+        for bnumber, largo_gen in strains[cepa].items():
+                # To Mb
+                largo_gen = largo_gen/(1*10**6)
+                
+                fg_gen = reduced['fg']
+                perc_gen = reduced['percentage']
+
+                T_replication_cost += replication_cost*largo_gen
+        #             T_transcription_gcost += transcription_gcost*largo_gen
+                T_transcription_tcost += transcription_tcost*largo_gen
+                T_upf_cost += upf_cost*perc_gen
+                
+
+        costos_calclulados[cepa] = {'Replication': T_replication_cost,
+    #                                'transcription_g': T_transcription_gcost,
+                                   'Transcription': T_transcription_tcost,
+                                   'UPF': T_upf_cost,
+                                   'Total': T_replication_cost + 
+                                    T_transcription_tcost +
+                                    T_upf_cost
+                                   }
+    return(costos_calclulados)
