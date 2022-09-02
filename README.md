@@ -2,4 +2,4 @@
 
 
 
-![alt text](https://github.com/utrillalab/proteomeVSgenome/raw/main/docs/Main_fig.tiff)
+![alt text](https://github.com/utrillalab/proteomeVSgenome/raw/main/docs/Main_fig.jpg)
