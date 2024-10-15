@@ -26,6 +26,7 @@ src/
 ```
 
 ## Notebooks
+
 ### 1. **Energy_simulations/**
 This directory contains notebooks that simulate specific energy-consuming processes:
 
@@ -42,7 +43,7 @@ This directory contains notebooks that simulate specific energy-consuming proces
   - **Inputs**: 
     - `../../files/models/iJL1678b.pickle` (original model).
     - `../../files/ecolime_data/codon_usage.csv` (codon usage data).
-    - Genes added (Approximately a 5%,10%, 15% y 20% of the 4600 genes): `[230,460,690,920]`.
+    - Genes added (Approximately a 5%, 10%, 15%, and 20% of the 4600 genes): `[230, 460, 690, 920]`.
   - **Outputs**:
     - Models saved as `../../files/models/AumGenes_GLC_OX_{number}.pickle` with added transcribed genes.
 
@@ -56,15 +57,43 @@ This directory contains notebooks that simulate specific energy-consuming proces
 
 ### 2. **Energy.ipynb**
 - **Purpose**: Analyzes ATP consumption at the reaction, gene, and strain levels using the ME model. It incorporates ATP costs for replication, transcription, and protein production derived from the energy simulations.
+- **Inputs**:
+  - ME model solved data from `../files/models/iJL1678b_solver.pickle`.
+  - ATP costs for replication from `Replication_cost.ipynb` outputs.
+  - ATP costs for transcription from `Transcription_cost.ipynb` outputs.
+  - ATP costs for UPF from `UPF_cost.ipynb` outputs.
 - **Outputs**:
-  - Data files on ATP consumption per reaction and per strain.
-  - Visualizations of energy consumption for different strains.
+  - Data files on ATP consumption per reaction saved as `../files/energy/energy_per_reaction.pickle`.
+  - Data files on ATP consumption per gene saved as `../files/energy/energy_per_gene.pickle`.
+  - Data files on ATP consumption per strain, including visualizations saved as part of the output figures.
 
 ### 3. **Genome_vs_proteome.ipynb**
 - **Purpose**: Compares genome and proteome reduction strategies by calculating energy and proteome load savings from eliminating non-essential genes.
+- **Inputs**:
+  - Gene deletion ranges for various strains:
+    - `../files/deleted_ranges/delta_16.csv` (for Δ16 strain).
+    - `../files/deleted_ranges/MS56.csv` (for MS56 strain).
+    - `../files/deleted_ranges/MDS42_69.csv` (for MDS strains).
+    - `../files/deleted_ranges/MDS12_V2.csv` (for MDS12 strain).
+    - `../files/deleted_ranges/MGF_line.csv` (for W3110-related strains).
+  - Proteomic data from Schmidt et al., 2016:
+    - `../files/proteome_Schmidt/Proteomic_data_fg.xlsx` (proteomic data).
+    - `../files/proteome_Schmidt/Proteome_size.xlsx` (total proteome sizes).
+  - Genome data from GenBank files:
+    - `../files/genomes/MG1655.gb` (MG1655 genome).
+    - `../files/genomes/W3110.gb` (W3110 genome).
 - **Outputs**:
-  - Data files and visualizations comparing genome and proteome reductions.
-
+  - Data files of mapped deleted genes saved as:
+    - `../files/deleted_genes/mapped_del_genes_Δ16.csv`
+    - `../files/deleted_genes/mapped_del_genes_MS56.csv`
+    - `../files/deleted_genes/mapped_del_genes_MDS12.csv`
+    - `../files/deleted_genes/mapped_del_genes_MDS42.csv`
+    - `../files/deleted_genes/mapped_del_genes_MDS69.csv`
+    - `../files/deleted_genes/mapped_del_genes_DGF298.csv`
+    - `../files/deleted_genes/mapped_del_genes_DGF327.csv`
+    - `../files/deleted_genes/mapped_del_genes_MGF02.csv`
+  - Data files of proteomic load and percentages saved as `../files/proteome_genome/protVSgen.csv`.
+  - Visualizations comparing genome and proteome reductions.
 
 ## Python Scripts
 
