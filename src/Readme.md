@@ -1,3 +1,4 @@
+
 # Source Code Documentation
 
 This directory contains the source code and Jupyter notebooks used for analyzing energy consumption and resource allocation strategies in minimized *E. coli* cells. The primary focus is on energy calculations and visualizations regarding genome and proteome reduction.
@@ -25,23 +26,45 @@ src/
 ```
 
 ## Notebooks
+### 1. **Energy_simulations/**
+This directory contains notebooks that simulate specific energy-consuming processes:
 
-### 1. **Energy.ipynb**
-- **Purpose**: This notebook analyzes ATP consumption at the reaction, gene, and strain levels using the ME model. It includes ATP costs for replication, transcription, and protein production derived from the energy simulations.
+- **Replication_cost.ipynb**
+  - **Purpose**: Simulates ATP costs for increasing DNA content in the ME model.
+  - **Inputs**: 
+    - `../../files/models/iJL1678b.pickle` (original model).
+    - Percent DNA data: `[1, 1.125, 1.25, 1.5]`.
+  - **Outputs**:
+    - Models saved as `../../files/models/DNA_per{value}.pickle` with modified DNA percentages.
+
+- **Transcription_cost.ipynb**
+  - **Purpose**: Simulates ATP costs associated with transcription processes in the ME model.
+  - **Inputs**: 
+    - `../../files/models/iJL1678b.pickle` (original model).
+    - `../../files/ecolime_data/codon_usage.csv` (codon usage data).
+    - Genes added (Approximately a 5%,10%, 15% y 20% of the 4600 genes): `[230,460,690,920]`.
+  - **Outputs**:
+    - Models saved as `../../files/models/AumGenes_GLC_OX_{number}.pickle` with added transcribed genes.
+
+- **UPF_cost.ipynb**
+  - **Purpose**: Simulates ATP costs associated with the Universal Protein Fraction (UPF) in the ME model.
+  - **Inputs**: 
+    - `../../files/models/iJL1678b.pickle` (original model).
+    - UPF new values:  `[0.24, .27, 0.30, .33, 0.36]`.
+  - **Outputs**:
+    - Models saved as `../../files/models/ATPM_UPF_OX_GLC{UPF_value}.pickle` with different UPF settings.
+
+### 2. **Energy.ipynb**
+- **Purpose**: Analyzes ATP consumption at the reaction, gene, and strain levels using the ME model. It incorporates ATP costs for replication, transcription, and protein production derived from the energy simulations.
 - **Outputs**:
-  - Data on ATP consumption per reaction and per strain.
+  - Data files on ATP consumption per reaction and per strain.
   - Visualizations of energy consumption for different strains.
 
-### 2. **Genome_vs_proteome.ipynb**
+### 3. **Genome_vs_proteome.ipynb**
 - **Purpose**: Compares genome and proteome reduction strategies by calculating energy and proteome load savings from eliminating non-essential genes.
 - **Outputs**:
   - Data files and visualizations comparing genome and proteome reductions.
 
-### 3. **Energy_simulations/**
-- **Purpose**: This directory contains notebooks that simulate specific energy-consuming processes:
-  - **Replication_cost.ipynb**: Simulates ATP costs for increasing DNA content.
-  - **Transcription_cost.ipynb**: Simulates ATP costs for transcription processes.
-  - **UPF_cost.ipynb**: Simulates ATP costs for protein production (UPF).
 
 ## Python Scripts
 
@@ -50,10 +73,10 @@ src/
 - **Key Functions**:
   - `get_energy_consumption_production(me)`: 
     - Calculates ATP consumption and production for each reaction in the ME model.
-    - Returns two dataframes: one for energy consumption and one for energy production.
+    - **Outputs**: Returns two dataframes: one for energy consumption and one for energy production.
   - `energy_per_model(modelos, group=False)`: 
     - Aggregates energy consumption for models.
-    - Returns total energy consumption and grouped consumption by reaction type if `group=True`.
+    - **Outputs**: Returns total energy consumption and grouped consumption by reaction type if `group=True`.
   - `get_energy_per_gene(energy_consumption, me)`: 
     - Distributes energy consumption across genes based on reaction types (metabolic, transcription, translation).
   - `get_energy_ME_proteome(strains, genes_finales, proteomic_data, replication_cost, transcription_tcost, upf_cost)`: 
@@ -96,7 +119,7 @@ src/
     - Displays multiple pandas DataFrames side by side in a single output cell for comparison.
   - `plot_perc_load(prot_load, prot_perc, conditions=None, strains=None, save=False, identifier='', colors_per_strain=colors_per_strain)`: 
     - Plots released proteomic load and its percentage for specified strains and conditions.
-  - `plot_distribution(distribucion_prot, tipo, eng=False, save=False, identifier='', colors_distribution=colors_distribution)`: 
+  - `plot_distribution(distribucion_prot, tipo, eng=False, save =False, identifier='', colors_distribution=colors_distribution)`: 
     - Plots histograms for average proteome distribution or specific conditions.
   - `plot_strain_distribution(info_cepas, distribucion_prot, names, title, tipo, save=False, identifier='', colors_per_strain=colors_per_strain)`: 
     - Visualizes the distribution of proteome load for specific strains.
