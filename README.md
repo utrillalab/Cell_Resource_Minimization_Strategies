@@ -1,8 +1,5 @@
 # Resource allocation in minimized cells: is genome reduction the best strategy? 🧬
 
-
-# Cell Resource Minimization Strategies
-
 This repository contains the source code and data for the paper **"Engineering Resource Allocation in Artificially Minimized Cells: Is Genome Reduction the Best Strategy?"**. The goal of this project is to analyze genome and proteome reduction strategies in *E. coli* to optimize resource allocation.
 
 ## Table of Contents
@@ -27,21 +24,30 @@ root
 │   └── relevant_document.md
 │
 ├── src/                           # Source code and notebooks
-│   ├── Energy_simulations/
-│   │   └── (Notebooks related to specific energy costs)
-│   ├── Energy.ipynb               # Energy calculations notebook
+│   ├── Energy_simulations/        # Additional simulations (Replication, Transcription, UPF costs)
+│   ├── Energy.ipynb               # Notebook for energy consumption analysis in ME model
 │   ├── Genome_vs_proteome.ipynb   # Comparison of genome and proteome reduction
-│   ├── plot_energy.py             # Scripts for plotting energy results
-│   └── get_gene_info.py           # Script for gene information retrieval
+│   ├── Multipanel_Energy_protReleased_Energy.pdf # Energy plot outputs
+│   ├── Prot_vs_Genome.pdf         # Genome vs Proteome comparison plot
+│   ├── __init__.py                # Package initialization file
+│   ├── energy_analisis.py         # Functions for energy analysis in ME model
+│   ├── get_gene_info.py           # Functions to get genome information
+│   ├── get_proteome_info.py       # Functions to get proteomic information
+│   ├── plot_energy.py             # Functions for energy-related plotting
+│   └── plot_proteome.py           # Functions for proteome-related plotting
 │
 ├── files/                         # Data generated or processed by notebooks
 │   ├── deleted_genes/
 │   ├── deleted_ranges/
 │   ├── ecolime_data/
+│   ├── energy/
+│   ├── genomes/
+│   ├── models/
 │   └── proteome_Schmidt/          # Proteome datasets used in analysis
 │
 └── README.md                      # This file
 ```
+
 
 
 ```mermaid
@@ -74,29 +80,65 @@ graph LR
     click 1 "https://github.com/utrillalab/Cell_Resource_Minimization_Strategies/blob/main/README.md"
 ```
 
-## How to Use the Code
-
-To use the code and run the simulations:
-
-1. Clone the repository:
-   ```
-   git clone https://github.com/utrillalab/Cell_Resource_Minimization_Strategies
-   ```
-2. Install the necessary Python dependencies:
-   ```
-   pip install -r requirements.txt
-   ```
-
-3. Run the notebooks in the following recommended order (see the next section for details).
 
 ## Notebooks Workflow
 
-The following Jupyter notebooks contain the main analysis and simulations. They should be followed in this order to understand the process:
+The Jupyter notebooks are the main computational tools for this project. Here is the recommended order to follow them:
 
-1. **Energy.ipynb**: This notebook introduces the initial energy cost calculations for replication, transcription, and translation of genes in the ME-model.
-2. **Genome_vs_proteome.ipynb**: Compares resource savings from genome and proteome reduction strategies. Generates data that is saved in the `files/` directory.
-3. **Replication_cost.ipynb, Transcription_cost.ipynb, UPF_cost.ipynb** (under `Energy_simulations/`): These notebooks detail the costs of specific cellular processes related to resource allocation.
+1. **[Energy_simulations/](src/Energy_simulations/)**:
+   Notebooks to simulate the ATP costs for replication, transcription, and UPF (Universal Protein Fraction). These are referenced by the main notebooks:
+   - `Replication_cost.ipynb`
+   - `Transcription_cost.ipynb`
+   - `UPF_cost.ipynb`
+   - **Output**: Generates data files related to ATP consumption and visualizes the energy costs per strain.
 
+1. **[Energy.ipynb](src/Energy.ipynb)**: 
+   This notebook analyzes the ATP consumption per reaction, gene, and strain using the ME model. It also takes into account the ATP costs for replication, transcription, and protein production processes obtained from src/Energy_simulation.
+   - **Output**: Generates data files related to ATP consumption and visualizes the energy costs per strain.
+   
+2. **[Genome_vs_proteome.ipynb](src/Genome_vs_proteome.ipynb)**: 
+   Compares genome and proteome reduction strategies by calculating how much energy and proteome load can be saved by eliminating non-essential genes.
+   - **Output**: Generates data files and plots comparing genome and proteome reductions.
+
+
+## Scripts Description
+
+The `src/` directory contains Python scripts used for energy calculations and data analysis.
+
+1. **energy_analisis.py**:
+   - Contains functions to calculate energy consumption per reaction, per gene, and total energy costs for minimized strains.
+   - Key Functions:
+     - `get_energy_consumption_production(me)`: Retrieves ATP consumption and production for each reaction in the ME model.
+     - `get_energy_per_gene()`: Calculates ATP consumption per gene based on reaction data.
+
+2. **plot_energy.py**:
+   - Functions for plotting energy consumption at various levels, including per strain and per gene.
+   - Key Functions:
+     - `plot_ME_energy()`: Visualizes energy consumption by strain.
+     - `plot_type_energy()`: Plots ATP consumption for different reaction types.
+
+3. **get_gene_info.py**:
+   - Functions for extracting genome information from GenBank files and mapping deleted genes to specific strains.
+
+4. **get_proteome_info.py**:
+   - Functions for working with proteomics datasets to calculate proteome load based on gene deletions.
+
+5. **plot_proteome.py**:
+   - Functions for plotting the distribution of proteome load across conditions.
+
+## Generated Files
+
+Running the notebooks and scripts will generate several output files, mostly saved in the `files/` directory:
+
+- **Deleted Genes**: Information on genes deleted in minimized strains.
+- **Energy**: Data related to ATP consumption per reaction, gene, and strain.
+  - `../files/energy/energy_per_reaction.pickle`
+  - `../files/energy/energy_per_gene.pickle`
+- **Proteome**: Data on proteome distributions from Schmidt et al. (2016).
+- **Plots**: Generated visualizations, including energy consumption and proteome load plots.
+  - `Multipanel_Energy_protReleased_Energy.pdf`
+  - `Prot_vs_Genome.pdf`
+  
 ## File Description
 
 The `files/` directory contains output files generated from the notebooks. Here is a brief description of each subdirectory:
