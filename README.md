@@ -1,7 +1,20 @@
 
 # Resource Allocation in Minimized Cells: Is Genome Reduction the Best Strategy? 🧬
-
 This repository contains the source code, data, and Jupyter notebooks for the paper **"Engineering Resource Allocation in Artificially Minimized Cells: Is Genome Reduction the Best Strategy?"**. The objective of this project is to explore genome and proteome reduction strategies in *E. coli* to optimize cellular resource allocation.
+
+## Table of Contents
+- [Visual Summary](#visual-summary)
+- [Overview](#overview)
+- [Repository Structure](#repository-structure)
+- [How to Use the Code](#how-to-use-the-code)
+- [Notebooks Workflow](#notebooks-workflow)
+- [Scripts Description](#scripts-description)
+- [Generated Files](#generated-files)
+- [File Description](#file-description)
+- [Citing the Project](#citing-the-project)
+
+## Visual Summary
+![alt text](https://github.com/utrillalab/proteomeVSgenome/raw/main/docs/Main_fig.jpg)
 
 ## Table of Contents
 
@@ -27,7 +40,9 @@ root
 │   └── relevant_document.md
 │
 ├── src/                           # Source code and notebooks
+│   ├── README.md                  # Overview of source code
 │   ├── Energy_simulations/        # Additional simulations (Replication, Transcription, UPF costs)
+│   │   └── README.md              # Overview of energy simulations
 │   ├── Energy.ipynb               # Notebook for energy consumption analysis in the ME model
 │   ├── Genome_vs_proteome.ipynb   # Comparison of genome and proteome reduction
 │   ├── Multipanel_Energy_protReleased_Energy.pdf # Energy plot outputs
@@ -40,12 +55,13 @@ root
 │   └── plot_proteome.py           # Functions for proteome-related plotting
 │
 ├── files/                         # Data generated or processed by notebooks
-│   ├── deleted_genes/
-│   ├── deleted_ranges/
-│   ├── ecolime_data/
-│   ├── energy/
-│   ├── genomes/
-│   ├── models/
+│   ├── README.md                  # Overview of files and their purposes
+│   ├── deleted_genes/             # Deleted genes information
+│   ├── deleted_ranges/            # Deleted ranges information
+│   ├── ecolime_data/              # Codon usage data
+│   ├── energy/                    # Energy consumption data
+│   ├── genomes/                   # Genomic data
+│   ├── models/                    # ME models for various simulations
 │   └── proteome_Schmidt/          # Proteome datasets used in the analysis
 │
 └── README.md                      # This file
@@ -109,17 +125,43 @@ The Jupyter notebooks are the primary computational tools for this project. Foll
 1. **[Energy_simulations/](src/Energy_simulations/)**:
    This directory contains additional simulations for the ATP costs of specific cellular processes:
    - `Replication_cost.ipynb`: Simulates ATP costs for DNA replication.
+     - **Inputs**: 
+       - `../../files/models/iJL1678b.pickle` (original model).
+       - Percent DNA data: `[1, 1.125, 1.25, 1.5]`.
+     - **Outputs**: Models saved as `../../files/models/DNA_per{value}.pickle` with modified DNA percentages.
+
    - `Transcription_cost.ipynb`: Simulates ATP costs for transcription processes.
+     - **Inputs**: 
+       - `../../files/models/iJL1678b.pickle` (original model).
+       - `../../files/ecolime_data/codon_usage.csv` (codon usage data).
+       - Genes added (Approximately a 5%, 10%, 15%, and 20% of the 4600 genes): `[230,460,690,920]`.
+     - **Outputs**: Models saved as `../../files/models/AumGenes_GLC_OX_{number}.pickle` with added transcribed genes.
+
    - `UPF_cost.ipynb`: Simulates ATP costs for protein production (Universal Protein Fraction - UPF).
-   - **Outputs**: Data related to ATP consumption and visualizations for each strain.
+     - **Inputs**: 
+       - `../../files/models/iJL1678b.pickle` (original model).
+       - UPF new values:  `[0.24, .27, 0.30, .33, 0.36]`.
+     - **Outputs**: Models saved as `../../files/models/ATPM_UPF_OX_GLC{UPF_value}.pickle` with different UPF settings.
 
 2. **[Energy.ipynb](src/Energy.ipynb)**: 
    This notebook is the core analysis of ATP consumption, including per reaction, gene, and strain using the ME model. It also factors in ATP costs from replication, transcription, and protein production (results from `Energy_simulations/`).
-   - **Outputs**: ATP consumption data and strain energy cost visualizations.
+   - **Inputs**:
+     - `../files/models/iJL1678b_solver.pickle` (solved ME model).
+     - Data files from the energy simulation outputs.
+   - **Outputs**: ATP consumption data, strain energy cost visualizations, and saved files:
+     - `../files/energy/energy_per_reaction.pickle`
+     - `../files/energy/energy_per_gene.pickle`
+     - `../files/energy/Costs_L&M_ME.csv`
 
 3. **[Genome_vs_proteome.ipynb](src/Genome_vs_proteome.ipynb)**: 
    This notebook compares genome and proteome reduction strategies by calculating the energy and proteome load savings from eliminating non-essential genes.
-   - **Outputs**: Data files and plots that compare genome vs proteome reductions.
+   - **Inputs**: 
+     - Deleted genes files for specific strains from `../files/deleted_genes/`.
+     - Deleted ranges files from `../files/deleted_ranges/`.
+     - Proteomic data files from `../files/proteome_Schmidt/`.
+   - **Outputs**: 
+     - Data files and plots that compare genome vs proteome reductions.
+     - `../files/proteome_genome/protVSgen.csv`
 
 ```mermaid
 flowchart TD
@@ -181,7 +223,10 @@ The `files/` directory contains output files generated from the notebooks. Below
 - `deleted_genes/`: Information about genes removed during genome reduction.
 - `deleted_ranges/`: Defines the genome deletion ranges used in the simulations.
 - `ecolime_data/`: Contains codon usage data and other *E. coli* specific datasets.
-- `proteome_Schmidt/`: Proteomic data from Schmidt et al. used in the proteome reduction analysis.
+- `energy/`: Contains energy consumption data and related files.
+- `genomes/`: Contains genomic data.
+- `models/`: Stores ME models for various simulations.
+- `proteome_Schmidt/`: Contains proteomic data used in the analysis.
 
 ## Citing the Project
 
@@ -190,5 +235,3 @@ If you use this repository or data in your work, please cite the original paper:
 ```
 Marquez-Zavala, E. & Utrilla, J. (2023) Engineering resource allocation in artificially minimized cells: Is genome reduction the best strategy? Microbial Biotechnology.
 ```
-
-![alt text](https://github.com/utrillalab/proteomeVSgenome/raw/main/docs/Main_fig.jpg)
